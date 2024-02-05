@@ -12,19 +12,27 @@ namespace TestTools
     /// </summary>
     public class MainTest
     {
-        public static void Main()
+        /// <summary>
+        /// 测试格雷厄姆算法
+        /// </summary>
+        public static void TestGrahamAlgorithm()
         {
             List<XYZ> points = new List<XYZ>() {
-                new XYZ(6,0,0),
-                new XYZ(2,1,0),
-                new XYZ(3,9,0),
-                new XYZ(2,8,0),
-                new XYZ(7,1,0),
-                new XYZ(9,4,0),
-                new XYZ(0,0,0),
+                new XYZ(4,1,0),
+                new XYZ(2,2,0),
+                new XYZ(5,2,0),
+                new XYZ(6,2,0),
+                new XYZ(3,3,0),
+                new XYZ(4,4,0),
+                new XYZ(5,4,0),
+                new XYZ(6,4,0),
             };
             GrahamAlgorithm algorithm = new GrahamAlgorithm();
-            var re = algorithm.PolorSorting(points);
+            var result = algorithm.GetConcexShell(points);
+        }
+        public static void Main()
+        {
+            TestGrahamAlgorithm();
         }
     }
 }

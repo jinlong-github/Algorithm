@@ -49,33 +49,6 @@ namespace TestTools.Model
                 return 0;
             return Math.Sqrt(Math.Pow(X - other.X, 2) + Math.Pow(Y - other.Y, 2) + Math.Pow(Z - other.Z, 2));
         }
-        /// <summary>
-        /// 求两点的点积
-        /// </summary>
-        /// <returns></returns>
-        public double DotProduct(XYZ other)
-        {
-            if (other == null)
-                return double.MaxValue;
-            return X * other.X + Y * other.Y + Z * other.Z;
-        }
-        /// <summary>
-        /// 点的模长
-        /// </summary>
-        /// <returns></returns>
-        public double ModuleLength()
-        {
-            return Math.Sqrt(X * X + Y * Y + Z * Z);
-        }
-        /// <summary>
-        /// 判断点是否同一点
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool IsSamePoint(XYZ other)
-        {
-            return X == other.X && Y == other.Y && Z == other.Z;
-        }
         public override string? ToString()
         {
             return $"坐标X：{X}，坐标Y：{Y}，坐标Z：{Z}";

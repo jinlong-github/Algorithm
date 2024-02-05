@@ -16,32 +16,18 @@ namespace TestTools.Model
         /// <summary>
         /// 起点坐标
         /// </summary>
-        public XYZ Start
-        {
-            get => Start;
-            set
-            {
-                Start = value;
-                Dirction = GetDirction(Start, End);
-            }
-
-        }
+        public XYZ Start { get; set; }
         /// <summary>
         /// 终点坐标
         /// </summary>
-        public XYZ End
-        {
-            get => End;
-            set
-            {
-                End = value;
-                Dirction = GetDirction(Start, End);
-            }
-        }
+        public XYZ End { get; set; }
         /// <summary>
         /// 方向
         /// </summary>
-        public XYZ Dirction { get; private set; }
+        public XYZ Dirction
+        {
+            get { return GetDirction(Start, End); }
+        }
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -51,7 +37,6 @@ namespace TestTools.Model
         {
             Start = start;
             End = end;
-            Dirction = GetDirction(start, end);
         }
 
         /// <summary>
