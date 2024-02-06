@@ -28,7 +28,14 @@ namespace TestTools
                 new XYZ(6,4,0),
             };
             GrahamAlgorithm algorithm = new GrahamAlgorithm();
-            var result = algorithm.GetConcexShell(points);
+            //获取点集合的凸壳顶点，使用点与线的位置计算
+            var result = algorithm.GetConcexShell(points, 0);
+            ////使用三点夹角计算
+            //var result = algorithm.GetConcexShell(points, 1);
+            //凸壳边界线
+            List<Line> boundary = algorithm.PointToLine(result);
+            
+
         }
         public static void Main()
         {

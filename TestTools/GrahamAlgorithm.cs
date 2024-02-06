@@ -1,4 +1,5 @@
-﻿using TestTools.Model;
+﻿using System.ComponentModel.Design;
+using TestTools.Model;
 using TestTools.Tools;
 
 namespace TestTools
@@ -15,6 +16,20 @@ namespace TestTools
         /// </summary>
         public GrahamAlgorithm() { }
         /// <summary>
+        /// 获取凸壳直径
+        /// </summary>
+        /// <param name="boundary">凸壳边界</param>
+        /// <returns></returns>
+        public Line GetConvexShellDiameter(List<Line> boundary)
+        {
+            List<XYZ> midpoints = new List<XYZ>();
+            foreach (Line line in boundary)
+            {
+                midpoints.Add(plt.GetLineMiddlePoint(line));
+            }
+            return null;
+        }
+        /// <summary>
         /// 将闭合区域有序点转化为闭合区域线
         /// </summary>
         /// <param name="points">点集合</param>
@@ -25,10 +40,11 @@ namespace TestTools
         }
         /// <summary>
         /// 获取点集合的凸壳顶点
+        /// 参数flag，0:使用点与线的位置计算，1:使用三点夹角计算
         /// </summary>
-        /// <param name="points"></param>
+        /// <param name="flag">标志</param>
         /// <returns></returns>
-        public List<XYZ> GetConcexShell(List<XYZ> points)
+        public List<XYZ> GetConcexShell(List<XYZ> points,int flag = 0)
         {
             //点去重
             points = plt.PointsRemoveRepeat(points);
@@ -36,14 +52,26 @@ namespace TestTools
             {
                 return points;
             }
-            var ps = PolorSorting(points);
+            var ps = PolorSorting(points);  
             List<XYZ> result = new List<XYZ>() { ps[0], ps[1] };
             for(int i = 2; i < ps.Count - 1; i++)
             {
                 result.Add(ps[i]);
-                if(!IsSameSide(Line.CreateLine(result[result.Count - 2], result.Last()), result[result.Count - 3], ps[i + 1]))
+                if(flag == 0)
                 {
-                    result.Remove(ps[i]);
+                    if (!IsSameSide(Line.CreateLine(result[result.Count - 2], result.Last()), result[result.Count - 3], ps[i + 1]))
+                    {
+                        result.Remove(ps[i]);
+                    }
+                }
+                else
+                {
+                    double angle1 = plt.ThreePointAngle(result[result.Count - 3], result[result.Count - 2], result.Last());
+                    double angle2 = plt.ThreePointAngle(result[result.Count - 3], result[result.Count - 2], ps[i + 1]);
+                    if(angle1 <= angle2)
+                    {
+                        result.Remove(ps[i]);
+                    }
                 }
             }
             result.Add(ps.Last());

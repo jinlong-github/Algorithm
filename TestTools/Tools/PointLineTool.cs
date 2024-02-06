@@ -166,7 +166,64 @@ namespace TestTools.Tools
         /// <returns></returns>
         public XYZ GetPointProjectLine(XYZ p,Line l)
         {
+            int flag = JudgeLineType(l);
+            if(flag == 1)
+            {
+                return new XYZ(p.X, l.Start.Y, 0);
+            }else if(flag == 2)
+            {
+                return new XYZ(l.Start.X, p.Y, 0);
+            }
+            else
+            {
+                XYZ ps = new XYZ(p.X - l.Start.X, p.Y - l.Start.Y, 0);
+                double project_length = DotProduct(l.Dirction, ps) / ModuleLength(l.Dirction);
+                return new XYZ(l.Start.X + l.Dirction.X * project_length, l.Start.Y + l.Dirction.Y * project_length, 0);
+            }
             return null;
+        }
+        /// <summary>
+        /// 判断线的类型(二维平面)
+        /// 1:横线，2:竖线，-1:斜线
+        /// </summary>
+        /// <param name="loss">误差值</param>
+        /// <returns></returns>
+        public int JudgeLineType(Line line,double loss = 0.01)
+        {
+            //横线
+            if(Math.Abs(line.Dirction.X) <= 1+loss && Math.Abs(line.Dirction.X) >= 1 - loss)
+            {
+                return 1;
+            }
+            //竖线
+            if (Math.Abs(line.Dirction.Y) <= 1 + loss && Math.Abs(line.Dirction.Y) >= 1 - loss)
+            {
+                return 2;
+            }
+            //斜线
+            return -1;
+        }
+        /// <summary>
+        /// 计算三个点的夹角（0,Π）
+        /// </summary>
+        /// <param name="previous">第一个点</param>
+        /// <param name="Apoint">夹角点</param>
+        /// <param name="latter">后一个点</param>
+        /// <returns></returns>
+        public double ThreePointAngle(XYZ previous,XYZ Apoint,XYZ latter)
+        {
+            XYZ dir1 = new XYZ(previous.X - Apoint.X, previous.Y - Apoint.Y, previous.Z - Apoint.Z);
+            XYZ dir2 = new XYZ(latter.X - Apoint.X, latter.Y - Apoint.Y, latter.Z - Apoint.Z);
+            double cos_angle = DotProduct(dir1, dir2) / (ModuleLength(dir1) * ModuleLength(dir2));
+            return Math.Acos(cos_angle);
+        }
+        /// <summary>
+        /// 获取线段中点
+        /// </summary>
+        /// <returns></returns>
+        public XYZ GetLineMiddlePoint(Line l)
+        {
+            return new XYZ((l.Start.X + l.End.X) / 2, (l.Start.Y + l.End.Y) / 2, (l.Start.Z + l.End.Z) / 2);
         }
     }
 }
