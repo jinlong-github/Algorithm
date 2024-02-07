@@ -240,5 +240,51 @@ namespace TestTools.Tools
             }
             return points;
         }
+        /// <summary>
+        /// 获取包含所有点的边界矩形
+        /// 返回值:左上，右上，右下，左下
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        public List<XYZ> GetBoundaryRectangle(List<XYZ> points)
+        {
+            double max_y = double.MinValue;
+            double min_y = double.MaxValue;
+            double max_x = double.MinValue;
+            double min_x = double.MaxValue;
+            foreach (XYZ point in points)
+            {
+                max_y = Math.Max(max_y, point.Y);
+                min_y = Math.Min(min_y, point.Y);
+                max_x = Math.Max(max_x, point.X);
+                min_x = Math.Min(min_x, point.X);
+            }
+            List<XYZ> result = new List<XYZ>()
+            {
+                new XYZ(min_x,max_y,0),
+                new XYZ(max_x,max_y,0),
+                new XYZ(max_x,min_y,0),
+                new XYZ(min_x,min_y,0)
+            };
+            return result;
+        }
+        /// <summary>
+        /// 获取包含点集合所有点的正三角形
+        /// </summary>
+        /// <param name="points">点集合</param>
+        /// <returns></returns>
+        public List<XYZ> TriangleContainPoints(List<XYZ> points)
+        {
+            var rec = GetBoundaryRectangle(points);
+            //判断最短的边
+            double width = rec[0].DistanceTo(rec[1]);
+            double height = rec[0].DistanceTo(rec[3]);
+            if (width > height)
+            {
+
+            }
+            //=======================================写至此方法
+            return null;
+        }
     }
 }
