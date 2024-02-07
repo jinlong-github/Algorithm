@@ -27,7 +27,65 @@ namespace TestTools
             {
                 midpoints.Add(plt.GetLineMiddlePoint(line));
             }
-            return null;
+            //获取顶点
+            List<XYZ> vertexs = plt.AreaLinesToPoints(boundary);
+            //每个顶点处理的最大距离线
+            List<Line> maxLines = new List<Line>();
+            for(int i = 0; i < vertexs.Count; i++)
+            {
+                //最大距离的顶点序号
+                int maxIndex = 0;
+                //辅助判断
+                int assistIndex = 0;
+                for (int k = 0;k < vertexs.Count - 2;k++)
+                {
+                    //当前计算中点序号,下一个顶点序号
+                    int midIndex = (i + k + 1 + vertexs.Count) % vertexs.Count;
+                    //下下一个顶点序号
+                    int index2 = (i + k + 2 + vertexs.Count) % vertexs.Count;
+                    XYZ vetor1 = new XYZ(vertexs[midIndex].X - midpoints[midIndex].X, 
+                        vertexs[midIndex].Y - midpoints[midIndex].Y, vertexs[midIndex].Z - midpoints[midIndex].Z);
+                    XYZ vetor2 = new XYZ(vertexs[index2].X - midpoints[midIndex].X,
+                        vertexs[index2].Y - midpoints[midIndex].Y, vertexs[index2].Z - midpoints[midIndex].Z);
+                    XYZ vetor0 = new XYZ(vertexs[i].X - midpoints[midIndex].X,
+                        vertexs[i].Y - midpoints[midIndex].Y, vertexs[i].Z - midpoints[midIndex].Z);
+                    //计算一个点积正负也可，角度0-180，计算一个可反推另一个,不可能为0（垂直）
+                    if(plt.DotProduct(vetor1,vetor0) > 0 && plt.DotProduct(vetor2, vetor0) < 0)
+                    {
+                        if(maxIndex == assistIndex)
+                        {
+                            maxIndex = index2;
+                            assistIndex = midIndex;
+                        }
+                        else
+                        {
+                            //只有这一种情况
+                            if(maxIndex == midIndex)
+                            {
+                                maxIndex = index2;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (maxIndex == assistIndex)
+                        {
+                            maxIndex = midIndex;
+                            assistIndex = index2;
+                        }
+                        else
+                        {
+                            //只有这一种情况
+                            if (maxIndex == index2)
+                            {
+                                maxIndex = midIndex;
+                            }
+                        }
+                    }
+                }
+                maxLines.Add(Line.CreateLine(vertexs[i],vertexs[maxIndex]));
+            }
+            return maxLines.OrderBy(it => it.Start.DistanceTo(it.End)).Last();
         }
         /// <summary>
         /// 将闭合区域有序点转化为闭合区域线

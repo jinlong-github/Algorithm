@@ -25,7 +25,7 @@ namespace TestTools
                 new XYZ(3,3,0),
                 new XYZ(4,4,0),
                 new XYZ(5,4,0),
-                new XYZ(6,4,0),
+                new XYZ(7,5,0),
             };
             GrahamAlgorithm algorithm = new GrahamAlgorithm();
             //获取点集合的凸壳顶点，使用点与线的位置计算
@@ -34,8 +34,8 @@ namespace TestTools
             //var result = algorithm.GetConcexShell(points, 1);
             //凸壳边界线
             List<Line> boundary = algorithm.PointToLine(result);
-            
-
+            //获取凸壳的直径
+            Line maxLine = algorithm.GetConvexShellDiameter(boundary);
         }
         public static void Main()
         {

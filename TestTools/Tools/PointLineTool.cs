@@ -225,5 +225,20 @@ namespace TestTools.Tools
         {
             return new XYZ((l.Start.X + l.End.X) / 2, (l.Start.Y + l.End.Y) / 2, (l.Start.Z + l.End.Z) / 2);
         }
+        /// <summary>
+        /// 将闭合区域线转为有序点
+        /// </summary>
+        /// <param name="lines"></param>
+        /// <returns></returns>
+        public List<XYZ> AreaLinesToPoints(List<Line> lines)
+        {
+            List<XYZ> points = new List<XYZ>();
+            //从第一条线开始（任意线作为起点线）
+            foreach (Line line in lines)
+            {
+                points.Add(line.Start);
+            }
+            return points;
+        }
     }
 }
