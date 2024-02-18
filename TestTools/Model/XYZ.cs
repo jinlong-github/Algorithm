@@ -51,7 +51,7 @@ namespace TestTools.Model
         }
         public override string? ToString()
         {
-            return $"坐标X：{X}，坐标Y：{Y}，坐标Z：{Z}";
+            return $"坐标XYZ：({X}，{Y}，{Z})";
         }
     }
 }

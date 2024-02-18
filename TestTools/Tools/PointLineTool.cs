@@ -269,22 +269,98 @@ namespace TestTools.Tools
             return result;
         }
         /// <summary>
+        /// 获取两个点的中点
+        /// </summary>
+        /// <returns></returns>
+        public XYZ GetTwoPointMid(XYZ p1,XYZ p2)
+        {
+            return new XYZ((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2, (p1.Z + p2.Z) / 2);
+        }
+        /// <summary>
         /// 获取包含点集合所有点的正三角形
         /// </summary>
         /// <param name="points">点集合</param>
         /// <returns></returns>
         public List<XYZ> TriangleContainPoints(List<XYZ> points)
         {
+            //获取边界矩形顶点
             var rec = GetBoundaryRectangle(points);
             //判断最短的边
             double width = rec[0].DistanceTo(rec[1]);
             double height = rec[0].DistanceTo(rec[3]);
-            if (width > height)
+            //获取中点
+            XYZ top_mid = GetTwoPointMid(rec[0], rec[1]);
+            //XYZ p1 = new XYZ(top_mid.X - width, top_mid.Y, top_mid.Z);
+            //XYZ p2 = new XYZ(top_mid.X + width, top_mid.Y, top_mid.Z);
+            //正三角形顶点1(上)
+            XYZ triangleP1 = new XYZ(top_mid.X, top_mid.Y + Math.Sqrt(3) * width, top_mid.Z);
+            //获取中点
+            XYZ bottom_mid = GetTwoPointMid(rec[2], rec[3]);
+            XYZ mid_b = new XYZ(bottom_mid.X, bottom_mid.Y - height, bottom_mid.Z);
+            //倍数
+            double multiple = 2 * height / Math.Sqrt(3) * width + 1;
+            //正三角形顶点2（左）
+            XYZ triangleP2 = new XYZ(mid_b.X - multiple * width, mid_b.Y, mid_b.Z);
+            //正三角形顶点3（右）
+            XYZ triangleP3 = new XYZ(mid_b.X + multiple * width, mid_b.Y, mid_b.Z);
+            return new List<XYZ>() { triangleP1, triangleP2, triangleP3 };
+        }
+        /// <summary>
+        /// 判断两条线段是否相交
+        /// </summary>
+        /// <returns></returns>
+        public bool JudgeLineIntersect(Line l1,Line l2)
+        {
+            //两条线段平行不存在交点
+            if (CalCrossProduct2D(l1.Dirction,l2.Dirction) == 0)
             {
-
+                return false;
             }
-            //=======================================写至此方法
-            return null;
+            //获取两条线的端点
+            XYZ p1 = l1.Start;
+            XYZ p2 = l1.End;
+            XYZ p3 = l2.Start;
+            XYZ p4 = l2.End;
+            //求出所需向量
+            XYZ p31 = new XYZ(p1.X - p3.X, p1.Y - p3.Y, p1.Z - p3.Z);
+            XYZ p43 = new XYZ(p3.X - p4.X, p3.Y - p4.Y, p3.Z - p4.Z);
+            XYZ p21 = new XYZ(p1.X - p2.X, p1.Y - p3.Y, p1.Z - p3.Z);
+            //交点p0 = p1 + t * p1p2 和 p0 = p3 + s * p3p4  ( 0<t<1 && 0<s<1)
+            double t = CalCrossProduct2D(p31, p43) / CalCrossProduct2D(p21, p43);
+            double s = CalCrossProduct2D(p31, p21) / CalCrossProduct2D(p21, p43);
+            //线段没有交点
+            if((t < 0 && t > 1)|| (s < 0 && s > 1))
+            {
+                return false;
+            }
+            //线段交点在端点处
+            if((t == 0||t == 1) && (s == 0 || s == 1))
+            {
+                return true;
+            }
+            //线段交点在线段内
+            if ((t > 0 && t < 1) && (s > 0 && s < 1))
+            {
+                return true;
+            }
+            //默认返回值false
+            return false;
+        }
+        /// <summary>
+        /// 计算两点之间的叉乘(3D)
+        /// </summary>
+        /// <returns></returns>
+        public XYZ CalCrossProduct3D(XYZ p1,XYZ p2)
+        {
+            return new XYZ(p1.Y * p2.Z, -(p1.X * p2.Z - p2.X * p1.Z), p1.X * p2.Y - p2.X * p1.Y);
+        }
+        /// <summary>
+        /// 计算两点之间的叉乘(2D)
+        /// </summary>
+        /// <returns></returns>
+        public double CalCrossProduct2D(XYZ p1, XYZ p2)
+        {
+            return p1.X * p2.Y - p2.X * p1.Y;
         }
     }
 }
