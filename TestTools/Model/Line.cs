@@ -63,7 +63,8 @@ namespace TestTools.Model
             double x_dis = e.X - s.X;
             double y_dis = e.Y - s.Y;
             double z_dis = e.Z - s.Z;
-            return new XYZ(Math.Round(x_dis / distance, 4), Math.Round(y_dis / distance, 4), Math.Round(z_dis / distance, 4));
+            //return new XYZ(Math.Round(x_dis / distance, 6), Math.Round(y_dis / distance, 6), Math.Round(z_dis / distance, 6));
+            return new XYZ(x_dis / distance, y_dis / distance, z_dis / distance);
         }
         
     }

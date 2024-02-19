@@ -306,11 +306,14 @@ namespace TestTools.Tools
             return new List<XYZ>() { triangleP1, triangleP2, triangleP3 };
         }
         /// <summary>
-        /// 判断两条线段是否相交
+        /// 判断两条线段是否相交，并找出交点
         /// </summary>
+        /// <param name="point">交点</param>
+        /// <param name="sign">sign=0默认方法求解,sign=1三角面积求解</param>
         /// <returns></returns>
-        public bool JudgeLineIntersect(Line l1,Line l2)
+        public bool JudgeLineIntersect(Line l1,Line l2,out XYZ point,int sign = 0)
         {
+            point = null;
             //两条线段平行不存在交点
             if (CalCrossProduct2D(l1.Dirction,l2.Dirction) == 0)
             {
@@ -321,26 +324,82 @@ namespace TestTools.Tools
             XYZ p2 = l1.End;
             XYZ p3 = l2.Start;
             XYZ p4 = l2.End;
-            //求出所需向量
-            XYZ p31 = new XYZ(p1.X - p3.X, p1.Y - p3.Y, p1.Z - p3.Z);
-            XYZ p43 = new XYZ(p3.X - p4.X, p3.Y - p4.Y, p3.Z - p4.Z);
-            XYZ p21 = new XYZ(p1.X - p2.X, p1.Y - p3.Y, p1.Z - p3.Z);
-            //交点p0 = p1 + t * p1p2 和 p0 = p3 + s * p3p4  ( 0<t<1 && 0<s<1)
-            double t = CalCrossProduct2D(p31, p43) / CalCrossProduct2D(p21, p43);
-            double s = CalCrossProduct2D(p31, p21) / CalCrossProduct2D(p21, p43);
-            //线段没有交点
-            if((t < 0 && t > 1)|| (s < 0 && s > 1))
+            if(sign == 0)
             {
-                return false;
+                //求出所需向量
+                XYZ p31 = new XYZ(p1.X - p3.X, p1.Y - p3.Y, p1.Z - p3.Z);
+                XYZ p43 = new XYZ(p3.X - p4.X, p3.Y - p4.Y, p3.Z - p4.Z);
+                XYZ p21 = new XYZ(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z);
+                //交点p0 = p1 + t * p1p2 和 p0 = p3 + s * p3p4  ( 0<t<1 && 0<s<1)
+                double t = CalCrossProduct2D(p31, p43) / CalCrossProduct2D(p21, p43);
+                double s = CalCrossProduct2D(p31, p21) / CalCrossProduct2D(p21, p43);
+                //线段没有交点
+                if ((t < 0 && t > 1) || (s < 0 && s > 1))
+                {
+                    return false;
+                }
+                //线段交点在端点处
+                if ((t == 0 || t == 1) || (s == 0 || s == 1))
+                {
+                    //交点 或者 point = new XYZ(p3.X + s * (p4.X - p3.X), p3.Y + s * (p4.Y - p3.Y), 0)
+                    point = new XYZ(p1.X + t * (p2.X - p1.X), p1.Y + t * (p2.Y - p1.Y), 0);
+                    return true;
+                }
+                //线段交点在线段内
+                if ((t > 0 && t < 1) && (s > 0 && s < 1))
+                {
+                    //交点 或者 point = new XYZ(p3.X + s * (p4.X - p3.X), p3.Y + s * (p4.Y - p3.Y), 0)
+                    point = new XYZ(p1.X + t * (p2.X - p1.X), p1.Y + t * (p2.Y - p1.Y), 0);
+                    return true;
+                }
             }
-            //线段交点在端点处
-            if((t == 0||t == 1) && (s == 0 || s == 1))
+            else
             {
-                return true;
-            }
-            //线段交点在线段内
-            if ((t > 0 && t < 1) && (s > 0 && s < 1))
-            {
+                //以p1p2为底边，用向量的叉乘计算三角形p1p2p3和p1p2p4面积,如果方向相反，点在线两侧；如果有面积为0，相交线端点。
+                XYZ p12 = new XYZ(p2.X - p1.X, p2.Y - p1.Y, p2.Z - p1.Z);
+                XYZ p23 = new XYZ(p3.X - p2.X, p3.Y - p2.Y, p3.Z - p2.Z);
+                XYZ p24 = new XYZ(p4.X - p2.X, p4.Y - p2.Y, p4.Z - p2.Z);
+                double M123 = CalCrossProduct2D(p12,p23) / 2;
+                if(M123 == 0)
+                {
+                    point = p3;
+                    return true;
+                }
+                double M124 = CalCrossProduct2D(p12,p24) / 2;
+                if (M124 == 0)
+                {
+                    point = p4;
+                    return true;
+                }
+                //同号没有交点
+                if(M123 * M124 > 0)
+                {
+                    return false;
+                }
+                //以p3p4为底边，用向量的叉乘计算三角形p3p4p1和p3p4p2面积,如果方向相反，点在线两侧；如果有面积为0，相交线端点。
+                XYZ p34 = new XYZ(p4.X - p3.X, p4.Y - p3.Y, p4.Z - p3.Z);
+                XYZ p42 = new XYZ(p2.X - p4.X, p2.Y - p4.Y, p2.Z - p4.Z);
+                XYZ p41 = new XYZ(p1.X - p4.X, p1.Y - p4.Y, p1.Z - p4.Z);
+                double M342 = CalCrossProduct2D(p34, p42) / 2;
+                if(M342 == 0)
+                {
+                    point = p2;
+                    return true;
+                }
+                double M341 = CalCrossProduct2D(p34, p41) / 2;
+                if(M341 == 0)
+                {
+                    point = p1;
+                    return true;
+                }
+                if(M342 * M341 > 0)
+                {
+                    return false;
+                }
+                //如果以p1p2为底边，以p3p4为底边，计算方向均相反，则两条线段相交于一点。
+                //如果以p1计算交点p0，p0 = p1 + t * p12
+                double t = Math.Abs(M341) / (Math.Abs(M123) + Math.Abs(M124));
+                point = new XYZ(p1.X + t * p12.X, p1.Y + t * p12.Y, p1.Z + t * p12.Z);
                 return true;
             }
             //默认返回值false
